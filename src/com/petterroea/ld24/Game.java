@@ -14,7 +14,16 @@ public class Game extends Applet implements Runnable{
 	public static void main(String[] args)
 	{
 		JFrame window = new JFrame("LD24 - Evolution");
-		window.setSize(800, 600);
+		if(!small)
+		{
+			window.setSize(TILES_W*16, TILES_H*16);
+			System.out.println("Set size: " + (TILES_W*16) + "x" + (TILES_H*16));
+		}
+		else
+		{
+			window.setSize(TILES_W*8, TILES_H*8);
+			System.out.println("Set size: " + (TILES_W*8) + "x" + (TILES_H*8));
+		}
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Game game = new Game();
@@ -23,19 +32,26 @@ public class Game extends Applet implements Runnable{
 		window.setVisible(true);
 		game.start();
 	}
+	static final int TILES_W=64;
+	static final int TILES_H=48;
+	static boolean small = true;
 	public int getScaledWidth()
 	{
-		return this.getWidth()/2;
+//		if(small)
+//		return TILES_W*8;
+		return TILES_W*4;
 	}
 	public int getScaledHeight()
 	{
-		return this.getHeight()/2;
+//		if(small)
+//		return TILES_H*8;
+		return TILES_H*4;
 	}
 	@Override
 	public void init()
 	{
 		gameThread = new Thread(this);
-		currentScreen = new Screen(this);
+		currentScreen = new GameScreen(this);
 	}
 	@Override
 	public void start()
