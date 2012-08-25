@@ -14,6 +14,6 @@ public class Screen
 	public void tick(int delta, Graphics g)
 	{
 		g.setColor(Color.black);
-		g.fillRect(0, 0, master.getWidth(), master.getHeight());
+		g.fillRect(0, 0, master.getScaledWidth(), master.getScaledHeight());
 	}
 }

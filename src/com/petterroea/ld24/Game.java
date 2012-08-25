@@ -23,6 +23,14 @@ public class Game extends Applet implements Runnable{
 		window.setVisible(true);
 		game.start();
 	}
+	public int getScaledWidth()
+	{
+		return this.getWidth()/2;
+	}
+	public int getScaledHeight()
+	{
+		return this.getHeight()/2;
+	}
 	@Override
 	public void init()
 	{
@@ -65,15 +73,16 @@ public class Game extends Applet implements Runnable{
 			}
 			frames++;
 			//The back buffer
-			if(buffer==null||buffer.getWidth()!=this.getWidth()||buffer.getHeight()!=this.getHeight())
+			if(buffer==null||buffer.getWidth()!=this.getScaledWidth()||buffer.getHeight()!=this.getScaledHeight())
 			{
-				buffer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+				buffer = new BufferedImage(this.getScaledWidth(), this.getScaledHeight(), BufferedImage.TYPE_INT_RGB);
 			}
 			//Screen system
 			Graphics g = buffer.getGraphics();
 			currentScreen.tick(delta, g);
 			//Draw to applet
-			this.getGraphics().drawImage(buffer, 0, 0, null);
+			//this.getGraphics().drawImage(buffer, 0, 0, null);
+			this.getGraphics().drawImage(buffer, 0, 0, this.getWidth(), this.getHeight(), null);
 			g.dispose();
 		}
 	}
