@@ -1,5 +1,6 @@
 package com.petterroea.ld24;
 import java.applet.Applet;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -11,47 +12,58 @@ public class Game extends Applet implements Runnable{
 	Thread gameThread;
 	boolean running = true;
 	Screen currentScreen;
+	public Game()
+	{
+		
+	}
+	JFrame container;
 	public static void main(String[] args)
 	{
 		JFrame window = new JFrame("LD24 - Evolution");
-		if(!small)
-		{
-			window.setSize(TILES_W*16, TILES_H*16);
-			System.out.println("Set size: " + (TILES_W*16) + "x" + (TILES_H*16));
-		}
-		else
-		{
-			window.setSize(TILES_W*8, TILES_H*8);
-			System.out.println("Set size: " + (TILES_W*8) + "x" + (TILES_H*8));
-		}
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Game game = new Game();
 		window.add(game);
 		game.init();
+		if(!small)
+		{
+			game.setPreferredSize(new Dimension(TILES_W*16, TILES_H*16));
+			System.out.println("Set size: " + (TILES_W*16) + "x" + (TILES_H*16));
+		}
+		else
+		{
+			game.setPreferredSize(new Dimension(TILES_W*8, TILES_H*8));
+			System.out.println("Set size: " + (TILES_W*8) + "x" + (TILES_H*8));
+		}
+		window.pack();
 		window.setVisible(true);
 		game.start();
 	}
 	static final int TILES_W=64;
 	static final int TILES_H=48;
 	static boolean small = true;
-	public int getScaledWidth()
+	public static int getScaledWidth()
 	{
 //		if(small)
 //		return TILES_W*8;
 		return TILES_W*4;
 	}
-	public int getScaledHeight()
+	public static int getScaledHeight()
 	{
 //		if(small)
 //		return TILES_H*8;
 		return TILES_H*4;
 	}
+	Input input;
 	@Override
 	public void init()
 	{
+		input = new Input(this);
+		this.addKeyListener(input);
+		this.addFocusListener(input);
 		gameThread = new Thread(this);
 		currentScreen = new GameScreen(this);
+		this.requestFocus();
 	}
 	@Override
 	public void start()
