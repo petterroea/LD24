@@ -11,8 +11,10 @@ public class EntityPlayer extends Entity {
 		// TODO Auto-generated constructor stub
 	}
 	static BufferedImage[][] player;
+	static BufferedImage[][] playerLeft;
 	boolean moving = false;
 	long runStart=0;
+	public static boolean left = true;
 	@Override
 	public void tick(int delta, Level level)
 	{
@@ -22,11 +24,13 @@ public class EntityPlayer extends Entity {
 		{
 			xspeed=-0.06;
 			keyDown=true;
+			left=true;
 		}
 		if(Input.keys[KeyEvent.VK_D])
 		{
 			xspeed=0.06;
 			keyDown=true;
+			left=false;
 		}
 		if(!keyDown)
 		{
@@ -90,14 +94,29 @@ public class EntityPlayer extends Entity {
 		if(player==null)
 		{
 			player=Util.loadSplit(12, 16, EntityPlayer.class.getResourceAsStream("char_anim.png"));
+			playerLeft=Util.loadSplitMirror(12, 16, EntityPlayer.class.getResourceAsStream("char_anim.png"));
 		}
 		if(!moving)
 		{
-			g.drawImage(player[0][0], (int)x-xoff, (int)y-yoff, null);
+			if(left)
+			{
+				g.drawImage(playerLeft[0][0], (int)x-xoff, (int)y-yoff, null);
+			}
+			else
+			{
+				g.drawImage(player[0][0], (int)x-xoff, (int)y-yoff, null);
+			}
 		}
 		else
 		{
-			g.drawImage(player[(int) ((((System.currentTimeMillis()-runStart)/150)%8)+1)][0], (int)x-xoff, (int)y-yoff, null);
+			if(left)
+			{
+				g.drawImage(playerLeft[(int) ((((System.currentTimeMillis()-runStart)/150)%6)+1)][0], (int)x-xoff, (int)y-yoff, null);
+			}
+			else
+			{
+				g.drawImage(player[(int) ((((System.currentTimeMillis()-runStart)/150)%6)+1)][0], (int)x-xoff, (int)y-yoff, null);
+			}
 		}
 	}
 }

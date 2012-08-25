@@ -32,6 +32,7 @@ public class GameScreen extends Screen {
 		if(Input.focus)
 			level.tick(delta);
 		level.render(g);
+		Util.drawString("Testing 123", 0, 0, g);
 	}
 
 }
