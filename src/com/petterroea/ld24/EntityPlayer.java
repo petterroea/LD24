@@ -15,6 +15,7 @@ public class EntityPlayer extends Entity {
 	boolean moving = false;
 	long runStart=0;
 	public static boolean left = true;
+	long lastFire = System.currentTimeMillis();
 	@Override
 	public void tick(int delta, Level level)
 	{
@@ -49,6 +50,18 @@ public class EntityPlayer extends Entity {
 		if(Input.keys[KeyEvent.VK_SPACE]&&canJump(level))
 		{
 			yspeed=-0.22;
+		}
+		if(Input.keys[KeyEvent.VK_ENTER]&&(System.currentTimeMillis()-lastFire>800))
+		{
+			lastFire=System.currentTimeMillis();
+			if(left)
+			{
+				level.entities.add(new EntityBullet((int)x, (int)y+5, 5, 5, -0.1, 0.0));
+			}
+			else
+			{
+				level.entities.add(new EntityBullet((int)x+8, (int)y+5, 5, 5, 0.1, 0.0));
+			}
 		}
 		super.tick(delta, level);
 		level.playerx=(int)x;
@@ -89,7 +102,7 @@ public class EntityPlayer extends Entity {
 		return false;
 	}
 	@Override
-	public void render(Graphics g, int xoff, int yoff)
+	public void render(Graphics g, int xoff, int yoff, Level level)
 	{
 		if(player==null)
 		{
@@ -118,5 +131,38 @@ public class EntityPlayer extends Entity {
 				g.drawImage(player[(int) ((((System.currentTimeMillis()-runStart)/150)%6)+1)][0], (int)x-xoff, (int)y-yoff, null);
 			}
 		}
+		//Computer activation and other derp.
+				Rectangle xrect = new Rectangle((int)x, (int)y, w, h);//Me
+				for(int loopx=(int)x/8; (loopx<(x/8)+(w/8)+1); loopx++)
+				{
+					for(int loopy=(int)y/8; (loopy<(y/8)+(h/8)+1); loopy++)
+					{
+						if(loopx>=0&&loopy>=0)
+						{
+							if(level.tiles[loopx][loopy]!=0)
+							{
+								Rectangle rect = new Rectangle(loopx*8, loopy*8, 8, 8);
+								if(rect.intersects(xrect))
+								{
+									if(level.tiles[loopx][loopy]==6)
+									{
+										if(level.master.dialog.equals("")&&Input.focus)
+										{
+											Util.drawString("Press enter to open", (Game.getScaledWidth()/2)-(190/2),Game.getScaledHeight()-15, g);
+											if(Input.keys[KeyEvent.VK_ENTER])
+											{
+												level.master.dialog=level.getDialog((int)loopx, (int)loopy);
+												Input.keys[KeyEvent.VK_ENTER]=false;
+												xspeed=0.0d;
+												yspeed=0.0d;
+												moving=false;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 	}
 }

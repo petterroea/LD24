@@ -16,20 +16,20 @@ public class Util {
 	private static BufferedImage[][] font;
 	public static void drawString(String in, int x, int y, Graphics g)
 	{
+		int fontSize=10;
 		if(font==null)
 		{
-			font=loadSplit(20, 20, Util.class.getResourceAsStream("font.png"));
+			font=loadSplit(fontSize, fontSize, Util.class.getResourceAsStream("font.png"));
 		}
 		in = in.toUpperCase();
 		int yoff=0;
-		int fontSize=20;
 		int letterOff=0;
 		for(int i = 0; i < in.length(); i++)
 		{
 			if(in.charAt(i)=='\n')
 			{
 				letterOff=0;
-				yoff+=fontSize;
+				yoff+=(fontSize+1);
 			}
 			else
 			{

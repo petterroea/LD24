@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -13,8 +14,13 @@ public class Level {
 	BufferedImage[][] tileRes;
 	LinkedList<Entity> entities;
 	double xoff=0, yoff=0;
-	public Level(InputStream in)
+	int w, h;
+	GameScreen master;
+	Random rand;
+	public Level(InputStream in, GameScreen master)
 	{
+		rand = new Random();
+		this.master = master;
 		long startTime = System.currentTimeMillis();
 		entities = new LinkedList<Entity>();
 		BufferedImage src = null;
@@ -23,6 +29,8 @@ public class Level {
 		} catch (IOException e) {
 			System.err.println("ERROR READING THE IMAGE, YOU IDIOT. NO TAMPERING WITH THE IMAGES.");
 		}
+		w=src.getWidth()*8;
+		h=src.getHeight()*8;
 		tileRes=Util.loadSplit(8, 8, Level.class.getResourceAsStream("tiles.png"));
 		tiles = new byte[src.getWidth()][src.getHeight()];
 		for(int x = 0; x < src.getWidth(); x++)
@@ -53,6 +61,16 @@ public class Level {
 				case 0xFF0000: //Pc
 					tiles[x][y]=6;
 					break;
+				case 0x0026FF: //Rat
+					entities.add(new EntitySlime(x*8, (y-1)*8));
+					break;
+				case 0xFFD800: //Vertical pipe
+					tiles[x][y]=8;
+					break;
+				case 0x00FFFF: //Vertical pipe with right puncture
+					tiles[x][y]=10;
+					entities.add(new EntityEmitter((x*8)+4, y*8, 0.2, -0.1, 200, 3));
+					break;
 				default:
 					tiles[x][y]=0;
 					break;
@@ -68,6 +86,11 @@ public class Level {
 		for(int i = 0; i < entities.size(); i++)
 		{
 			entities.get(i).tick(delta, this);
+			if(entities.get(i).dead)
+			{
+				entities.remove(i);
+				i--;
+			}
 		}
 		int levelX=playerx/Game.getScaledWidth();
 		int levelY=playery/Game.getScaledHeight();
@@ -104,7 +127,27 @@ public class Level {
 		}
 		for(int i = 0; i < entities.size(); i++)
 		{
-			entities.get(i).render(g, (int)xoff, (int)yoff);
+			entities.get(i).render(g, (int)xoff, (int)yoff, this);
 		}
+		Util.drawString(kills + " of " + (weaponLevel*4) + " kills, Level " + weaponLevel, 0, Game.getScaledHeight()-10, g);
+	}
+	public void doKill()
+	{
+		kills++;
+		if(kills>weaponLevel*4)
+		{
+			kills=0;
+			weaponLevel++;
+		}
+	}
+	int weaponLevel=1;
+	int kills=0;
+	public String getDialog(int loopx, int loopy) {
+		// TODO Auto-generated method stub
+		if(loopx==17&&loopy==30)
+			return "Your weapon is weak\n\nKill and destroy to\nevolve it.\n\nEnter to fire.";
+		if(loopx==9&&loopy==55)
+			return "This is a slime.\nHe evolved from suage.\nHe spits radioactive goo.";
+		return "Hi.";
 	}
 }
