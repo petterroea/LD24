@@ -17,9 +17,30 @@ public class EntityBullet extends Entity {
 	{
 		level.entities.add(new EntityParticle((int)x+2, (int)y+2, 3, 3, xspeed*level.rand.nextDouble(), yspeed*level.rand.nextDouble(), 1000, 1000, 1, GRAVITY));
 	}
+	public void doDamageCheck(Level level)
+	{
+		Rectangle xrect = new Rectangle((int)x, (int)y, w, h);//Me
+		for(int i = 0; i < level.entities.size(); i++)
+		{
+			Rectangle tempBox = new Rectangle((int)level.entities.get(i).x, (int)level.entities.get(i).y, (int)level.entities.get(i).w, (int)level.entities.get(i).h);
+			if(tempBox.intersects(xrect))
+			{
+				if(level.entities.get(i) instanceof EntityPlayer || level.entities.get(i) instanceof EntityBullet || level.entities.get(i) instanceof EntityParticle)
+				{
+					
+				}
+				else
+				{
+					level.entities.get(i).damage(level);
+					dead=true;
+				}
+			}
+		}
+	}
 	@Override
 	public void tick(int delta, Level level)
 	{
+		doDamageCheck(level);
 		if(tickRand.nextInt(100/(delta+1))==0)
 		{
 			//level.entities.add(new EntityParticle((int)x+2, (int)y+2, 3, 3, xspeed*0.6, yspeed*0.6, 1000, 1000, 1+level.rand.nextInt(2), GRAVITY));
@@ -54,7 +75,7 @@ public class EntityBullet extends Entity {
 							{
 								if(level.tiles[loopx][loopy]==special[i])
 								{
-									doSpecial(level.tiles[loopx][loopy]);
+									doSpecial(level.tiles[loopx][loopy], level);
 								}
 							}
 							boolean nonColl = false;
@@ -94,7 +115,7 @@ public class EntityBullet extends Entity {
 							{
 								if(level.tiles[loopx][loopy]==special[i])
 								{
-									doSpecial(level.tiles[loopx][loopy]);
+									doSpecial(level.tiles[loopx][loopy], level);
 								}
 							}
 							boolean nonColl = false;

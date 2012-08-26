@@ -9,7 +9,7 @@ public class EntityEmitter extends Entity {
 		this.xMomentum=xmomentum;
 		this.yMomentum=ymomentum;
 		this.particle=particle;
-		
+		this.amount=amount;
 		// TODO Auto-generated constructor stub
 	}
 	@Override

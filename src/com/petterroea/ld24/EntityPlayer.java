@@ -1,5 +1,6 @@
 package com.petterroea.ld24;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -14,8 +15,41 @@ public class EntityPlayer extends Entity {
 	static BufferedImage[][] playerLeft;
 	boolean moving = false;
 	long runStart=0;
+	int health = 10;
 	public static boolean left = true;
 	long lastFire = System.currentTimeMillis();
+	@Override
+	public void doSpecial(byte theByte, Level level)
+	{
+		if(theByte==13)
+		{
+			this.yspeed=-0.5;
+			this.health=this.health-5;
+			if(this.health<=0)
+			{
+				level.dead=true;
+				dead = true;
+				for(int i = 0; i < 300; i++)
+				{
+					level.entities.add(new EntityParticle((int)x+level.rand.nextInt(8), (int)y+level.rand.nextInt(16), 3, 3, (level.rand.nextDouble()-0.5)/2, (level.rand.nextDouble()-0.5)/2, 3000, 3000, 4+level.rand.nextInt(2), GRAVITY/3));
+				}
+			}
+		}
+	}
+	@Override
+	public void damage(Level level)
+	{
+		health--;
+		if(health<=0)
+		{
+			level.dead=true;
+			dead = true;
+			for(int i = 0; i < 300; i++)
+			{
+				level.entities.add(new EntityParticle((int)x+level.rand.nextInt(8), (int)y+level.rand.nextInt(16), 3, 3, (level.rand.nextDouble()-0.5)/2, (level.rand.nextDouble()-0.5)/2, 3000, 3000, 4+level.rand.nextInt(2), GRAVITY/3));
+			}
+		}
+	}
 	@Override
 	public void tick(int delta, Level level)
 	{
@@ -63,6 +97,23 @@ public class EntityPlayer extends Entity {
 				level.entities.add(new EntityBullet((int)x+8, (int)y+5, 5, 5, 0.1, 0.0));
 			}
 		}
+		Rectangle me = new Rectangle((int)x, (int)y, w, h);
+		for(int i = 0; i < level.entities.size(); i++)
+		{
+			if(level.entities.get(i) instanceof EntityHostile)
+			{
+				Rectangle temp = new Rectangle((int)level.entities.get(i).x, (int)level.entities.get(i).y, (int)level.entities.get(i).w, (int)level.entities.get(i).h);
+				if(me.intersects(temp))
+				{
+					level.dead=true;
+					dead = true;
+					for(int a = 0; a < 300; a++)
+					{
+						level.entities.add(new EntityParticle((int)x+level.rand.nextInt(8), (int)y+level.rand.nextInt(16), 3, 3, (level.rand.nextDouble()-0.5)/2, (level.rand.nextDouble()-0.5)/2, 3000, 3000, 4+level.rand.nextInt(2), GRAVITY/3));
+					}
+				}
+			}
+		}
 		super.tick(delta, level);
 		level.playerx=(int)x;
 		level.playery=(int)y;
@@ -104,6 +155,11 @@ public class EntityPlayer extends Entity {
 	@Override
 	public void render(Graphics g, int xoff, int yoff, Level level)
 	{
+		g.setColor(Color.red);
+		g.fillRect(0, 0, Game.getScaledWidth(), 3);
+		g.setColor(Color.green);
+		double precentage = ((double)health/10.0)*Game.getScaledWidth();
+		g.fillRect(0, 0, (int)precentage, 3);
 		if(player==null)
 		{
 			player=Util.loadSplit(12, 16, EntityPlayer.class.getResourceAsStream("char_anim.png"));

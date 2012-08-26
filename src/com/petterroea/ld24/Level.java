@@ -1,6 +1,7 @@
 package com.petterroea.ld24;
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,11 @@ public class Level {
 	int w, h;
 	GameScreen master;
 	Random rand;
+	boolean dead = false;
+	int spawnx = -1;
+	int spawny = -1;
+	int lastScreenX=-1;
+	int lastScreenY=-1;
 	public Level(InputStream in, GameScreen master)
 	{
 		rand = new Random();
@@ -69,7 +75,10 @@ public class Level {
 					break;
 				case 0x00FFFF: //Vertical pipe with right puncture
 					tiles[x][y]=10;
-					entities.add(new EntityEmitter((x*8)+4, y*8, 0.2, -0.1, 200, 3));
+					entities.add(new EntityEmitter((x*8)+4, y*8, 0.2, -0.1, 400, 3));
+					break;
+				case 0xFFF600: //Acid
+					tiles[x][y]=13;
 					break;
 				default:
 					tiles[x][y]=0;
@@ -83,6 +92,25 @@ public class Level {
 	int playery=0;
 	public void tick(int delta)
 	{
+		if(Input.keys[KeyEvent.VK_ENTER])
+		{
+			if(dead)
+			{
+				Input.keys[KeyEvent.VK_ENTER]=false;
+				master.level=new Level(Level.class.getResourceAsStream("level.png"), master);
+				for(int i = 0; i < master.level.entities.size(); i++)
+				{
+					if(master.level.entities.get(i) instanceof EntityPlayer)
+					{
+						master.level.entities.get(i).x=spawnx;
+						master.level.entities.get(i).y=spawny;
+					}
+				}
+				master.level.xoff=xoff;
+				master.level.yoff=yoff;
+				return;
+			}
+		}
 		for(int i = 0; i < entities.size(); i++)
 		{
 			entities.get(i).tick(delta, this);
@@ -94,21 +122,29 @@ public class Level {
 		}
 		int levelX=playerx/Game.getScaledWidth();
 		int levelY=playery/Game.getScaledHeight();
+		if(levelX!=lastScreenX||levelY!=lastScreenY)
+		{
+			lastScreenX=levelX;
+			lastScreenY=levelY;
+			spawnx=playerx;
+			spawny=playery;
+			System.out.println("Set spawn");
+		}
 		if(xoff<levelX*Game.getScaledWidth())
 		{
-			xoff+=0.8*delta;
+			xoff+=0.9*delta;
 		}
 		if(xoff>levelX*Game.getScaledWidth())
 		{
-			xoff-=0.8*delta;
+			xoff-=0.9*delta;
 		}
 		if(yoff<levelY*Game.getScaledHeight())
 		{
-			yoff+=0.8*delta;
+			yoff+=0.9*delta;
 		}
 		if(yoff>levelY*Game.getScaledHeight())
 		{
-			yoff-=0.8*delta;
+			yoff-=0.9*delta;
 		}
 	}
 	public void render(Graphics g)
@@ -130,6 +166,10 @@ public class Level {
 			entities.get(i).render(g, (int)xoff, (int)yoff, this);
 		}
 		Util.drawString(kills + " of " + (weaponLevel*4) + " kills, Level " + weaponLevel, 0, Game.getScaledHeight()-10, g);
+		if(dead)
+		{
+			Util.drawString("Press enter", (Game.getScaledWidth()/2)-(110/2), (Game.getScaledHeight()/2)-5, g);
+		}
 	}
 	public void doKill()
 	{

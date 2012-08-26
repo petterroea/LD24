@@ -14,12 +14,12 @@ public class Entity {
 	double xspeed=0.0d, yspeed=0.0d;
 	double GRAVITY = 0.0011d;
 	static final double TERMINAL_VELOCITY=0.30d;
-	byte[] nonCollide = new byte[]{6};
-	byte[] special = new byte[]{};
+	byte[] nonCollide = new byte[]{6, 13};
+	byte[] special = new byte[]{13};
 	boolean dead = false;
-	public void doSpecial(byte theByte)
+	public void doSpecial(byte theByte, Level level)
 	{
-		if(theByte==6)
+		if(theByte==13)
 		{
 			
 		}
@@ -66,7 +66,7 @@ public class Entity {
 							{
 								if(level.tiles[loopx][loopy]==special[i])
 								{
-									doSpecial(level.tiles[loopx][loopy]);
+									doSpecial(level.tiles[loopx][loopy], level);
 								}
 							}
 							boolean nonColl = false;
@@ -108,7 +108,7 @@ public class Entity {
 							{
 								if(level.tiles[loopx][loopy]==special[i])
 								{
-									doSpecial(level.tiles[loopx][loopy]);
+									doSpecial(level.tiles[loopx][loopy], level);
 								}
 							}
 							boolean nonColl = false;
@@ -130,6 +130,10 @@ public class Entity {
 				}
 			}
 		}
+	}
+	public void damage(Level level)
+	{
+		
 	}
 	public void render(Graphics g, int xoff, int yoff, Level level)
 	{

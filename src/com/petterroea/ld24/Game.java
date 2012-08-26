@@ -62,7 +62,7 @@ public class Game extends Applet implements Runnable{
 		this.addKeyListener(input);
 		this.addFocusListener(input);
 		gameThread = new Thread(this);
-		currentScreen = new GameScreen(this);
+		currentScreen = new ScreenMainMenu(this);
 		this.requestFocus();
 	}
 	@Override
