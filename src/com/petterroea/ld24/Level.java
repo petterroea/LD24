@@ -1,5 +1,6 @@
 package com.petterroea.ld24;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -67,7 +68,7 @@ public class Level {
 				case 0xFF0000: //Pc
 					tiles[x][y]=6;
 					break;
-				case 0x0026FF: //Rat
+				case 0x0026FF: //Slime
 					entities.add(new EntitySlime(x*8, (y-1)*8));
 					break;
 				case 0xFFD800: //Vertical pipe
@@ -79,6 +80,12 @@ public class Level {
 					break;
 				case 0xFFF600: //Acid
 					tiles[x][y]=13;
+					break;
+				case 0xFF00DC: //End Game
+					tiles[x][y]=14;
+					break;
+				case 0x0094FF: //Small
+					entities.add(new EntitySmall(x*8, (y*8)+4));
 					break;
 				default:
 					tiles[x][y]=0;
@@ -108,20 +115,30 @@ public class Level {
 				}
 				master.level.xoff=xoff;
 				master.level.yoff=yoff;
+				master.level.kills=kills;
+				master.level.weaponLevel=weaponLevel;
 				return;
-			}
-		}
-		for(int i = 0; i < entities.size(); i++)
-		{
-			entities.get(i).tick(delta, this);
-			if(entities.get(i).dead)
-			{
-				entities.remove(i);
-				i--;
 			}
 		}
 		int levelX=playerx/Game.getScaledWidth();
 		int levelY=playery/Game.getScaledHeight();
+		for(int i = 0; i < entities.size(); i++)
+		{
+			int entLevX=(int) (entities.get(i).x/Game.getScaledWidth());
+			int entLevY=(int) (entities.get(i).y/Game.getScaledHeight());
+			if((entLevX==levelX&&entLevY==levelY)||(entities.get(i) instanceof EntityPlayer))
+			{
+				entities.get(i).tick(delta, this);
+				if(entities.get(i).dead)
+				{
+					entities.remove(i);
+					i--;
+				}
+			}
+		}
+		levelX=playerx/Game.getScaledWidth();
+		levelY=playery/Game.getScaledHeight();
+		
 		if(levelX!=lastScreenX||levelY!=lastScreenY)
 		{
 			lastScreenX=levelX;
@@ -165,7 +182,20 @@ public class Level {
 		{
 			entities.get(i).render(g, (int)xoff, (int)yoff, this);
 		}
-		Util.drawString(kills + " of " + (weaponLevel*2) + " kills, Level " + weaponLevel, 0, Game.getScaledHeight()-10, g);
+		//Util.drawString(kills + " of " + (weaponLevel*2) + " kills, Level " + weaponLevel, 0, Game.getScaledHeight()-10, g);
+		g.setColor(Color.red);
+		g.fillRect(0, Game.getScaledHeight()-3, Game.getScaledWidth(), 3);
+		g.setColor(Color.blue);
+		double progress=0.0;
+		if(kills==0)
+		{
+			progress = 0;
+		}
+		else
+		{
+			progress = ((double)kills/(double)(weaponLevel*2))*Game.getScaledWidth();
+		}
+		g.fillRect(0, Game.getScaledHeight()-3, (int)progress, 3);
 		if(dead)
 		{
 			Util.drawString("Press enter", (Game.getScaledWidth()/2)-(110/2), (Game.getScaledHeight()/2)-5, g);
@@ -174,10 +204,11 @@ public class Level {
 	public void doKill()
 	{
 		kills++;
-		if(kills>weaponLevel*2)
+		if(kills>=weaponLevel*2)
 		{
 			kills=0;
 			weaponLevel++;
+			master.dialog="Your weapon has evolved";
 		}
 	}
 	int weaponLevel=1;

@@ -25,7 +25,7 @@ public class ScreenMainMenu extends Screen {
 		}
 		if(System.currentTimeMillis()-created>10000)
 		{
-			
+			master.currentScreen=new CreditsScreen(master);
 		}
 	}
 

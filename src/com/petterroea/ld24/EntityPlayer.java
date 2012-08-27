@@ -27,12 +27,8 @@ public class EntityPlayer extends Entity {
 			this.health=this.health-5;
 			if(this.health<=0)
 			{
-				level.dead=true;
-				dead = true;
-				for(int i = 0; i < 300; i++)
-				{
-					level.entities.add(new EntityParticle((int)x+level.rand.nextInt(8), (int)y+level.rand.nextInt(16), 3, 3, (level.rand.nextDouble()-0.5)/2, (level.rand.nextDouble()-0.5)/2, 3000, 3000, 4+level.rand.nextInt(2), GRAVITY/3));
-				}
+				health=0;
+				damage(level);
 			}
 		}
 	}
@@ -48,6 +44,11 @@ public class EntityPlayer extends Entity {
 			{
 				level.entities.add(new EntityParticle((int)x+level.rand.nextInt(8), (int)y+level.rand.nextInt(16), 3, 3, (level.rand.nextDouble()-0.5)/2, (level.rand.nextDouble()-0.5)/2, 3000, 3000, 4+level.rand.nextInt(2), GRAVITY/3));
 			}
+			GameScreen.dead.play();
+		}
+		else
+		{
+			GameScreen.hit.play();
 		}
 	}
 	@Override
@@ -84,17 +85,21 @@ public class EntityPlayer extends Entity {
 		if(Input.keys[KeyEvent.VK_SPACE]&&canJump(level))
 		{
 			yspeed=-0.22;
+			GameScreen.jump.play();
 		}
-		if(Input.keys[KeyEvent.VK_ENTER]&&(System.currentTimeMillis()-lastFire>800))
+		int fireTime=800/level.weaponLevel;
+		double speed = 0.1*level.weaponLevel;
+		if(Input.keys[KeyEvent.VK_ENTER]&&(System.currentTimeMillis()-lastFire>fireTime))
 		{
 			lastFire=System.currentTimeMillis();
+			GameScreen.shoot.play();
 			if(left)
 			{
-				level.entities.add(new EntityBullet((int)x, (int)y+5, 5, 5, -0.1, 0.0));
+				level.entities.add(new EntityBullet((int)x, (int)y+5, 5, 5, -speed, 0.0));
 			}
 			else
 			{
-				level.entities.add(new EntityBullet((int)x+8, (int)y+5, 5, 5, 0.1, 0.0));
+				level.entities.add(new EntityBullet((int)x+8, (int)y+5, 5, 5, speed, 0.0));
 			}
 		}
 		Rectangle me = new Rectangle((int)x, (int)y, w, h);
@@ -105,12 +110,8 @@ public class EntityPlayer extends Entity {
 				Rectangle temp = new Rectangle((int)level.entities.get(i).x, (int)level.entities.get(i).y, (int)level.entities.get(i).w, (int)level.entities.get(i).h);
 				if(me.intersects(temp))
 				{
-					level.dead=true;
-					dead = true;
-					for(int a = 0; a < 300; a++)
-					{
-						level.entities.add(new EntityParticle((int)x+level.rand.nextInt(8), (int)y+level.rand.nextInt(16), 3, 3, (level.rand.nextDouble()-0.5)/2, (level.rand.nextDouble()-0.5)/2, 3000, 3000, 4+level.rand.nextInt(2), GRAVITY/3));
-					}
+					health=0;
+					damage(level);
 				}
 			}
 		}
@@ -215,6 +216,18 @@ public class EntityPlayer extends Entity {
 											}
 										}
 									}
+									if(level.tiles[loopx][loopy]==14)
+									{
+										if(level.master.dialog.equals("")&&Input.focus)
+										{
+											Util.drawString("Press enter to finish", (Game.getScaledWidth()/2)-(210/2),Game.getScaledHeight()-15, g);
+											if(Input.keys[KeyEvent.VK_ENTER])
+											{
+												level.master.master.currentScreen=new CreditsScreen(level.master.master);
+											}
+										}
+									}
+									
 								}
 							}
 						}

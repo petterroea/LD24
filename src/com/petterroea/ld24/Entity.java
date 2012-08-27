@@ -14,8 +14,8 @@ public class Entity {
 	double xspeed=0.0d, yspeed=0.0d;
 	double GRAVITY = 0.0011d;
 	static final double TERMINAL_VELOCITY=0.30d;
-	byte[] nonCollide = new byte[]{6, 13};
-	byte[] special = new byte[]{13};
+	byte[] nonCollide = new byte[]{6, 13, 14};
+	byte[] special = new byte[]{13, 14};
 	boolean dead = false;
 	public void doSpecial(byte theByte, Level level)
 	{

@@ -11,6 +11,10 @@ import javax.imageio.ImageIO;
 
 public class GameScreen extends Screen {
 	Level level;
+	public static Sound jump;
+	public static Sound hit;
+	public static Sound dead;
+	public static Sound shoot;
 	BufferedImage backdrop;
 	long anim = System.currentTimeMillis();
 	public GameScreen(Game master) {
@@ -23,7 +27,11 @@ public class GameScreen extends Screen {
 		}
 		// TODO Auto-generated constructor stub
 		level = new Level(GameScreen.class.getResourceAsStream("level.png"), this);
-		dialog="The monsters are mutated,\nthere isnt much time!";
+		dialog="Press the button!\nthere isnt much time!";
+		jump = new Sound(GameScreen.class.getResourceAsStream("jump.wav"));
+		hit = new Sound(GameScreen.class.getResourceAsStream("hit.wav"));
+		dead = new Sound(GameScreen.class.getResourceAsStream("dead.wav"));
+		shoot = new Sound(GameScreen.class.getResourceAsStream("shoot.wav"));
 	}
 	String dialog = "";
 	@Override
