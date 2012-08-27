@@ -41,7 +41,7 @@ public class Game extends Applet implements Runnable{
 	}
 	static final int TILES_W=64;
 	static final int TILES_H=48;
-	static boolean small = true;
+	static boolean small = false;
 	public static int getScaledWidth()
 	{
 //		if(small)

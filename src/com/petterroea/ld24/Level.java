@@ -165,7 +165,7 @@ public class Level {
 		{
 			entities.get(i).render(g, (int)xoff, (int)yoff, this);
 		}
-		Util.drawString(kills + " of " + (weaponLevel*4) + " kills, Level " + weaponLevel, 0, Game.getScaledHeight()-10, g);
+		Util.drawString(kills + " of " + (weaponLevel*2) + " kills, Level " + weaponLevel, 0, Game.getScaledHeight()-10, g);
 		if(dead)
 		{
 			Util.drawString("Press enter", (Game.getScaledWidth()/2)-(110/2), (Game.getScaledHeight()/2)-5, g);
@@ -174,7 +174,7 @@ public class Level {
 	public void doKill()
 	{
 		kills++;
-		if(kills>weaponLevel*4)
+		if(kills>weaponLevel*2)
 		{
 			kills=0;
 			weaponLevel++;
